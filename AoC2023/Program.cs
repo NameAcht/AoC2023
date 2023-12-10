@@ -1,11 +1,15 @@
-﻿namespace AoC2023
+﻿using System.Diagnostics;
+
+namespace AoC2023
 {
     internal class Program
     {
         public static void Main()
         {
-            var input = File.ReadAllLines("input05Test.txt");
-            Console.WriteLine(Day04.Part2(input).ToString());
+            var sw = Stopwatch.StartNew();
+            var input = File.ReadAllLines("input05.txt");
+            Console.WriteLine(Day05.Part2(input).ToString());
+            Console.WriteLine(sw.Elapsed.ToString());
         }
     }
 }
