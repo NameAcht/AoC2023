@@ -4,7 +4,7 @@
     {
         public static void Main()
         {
-            var input = File.ReadAllLines("input04.txt");
+            var input = File.ReadAllLines("input05Test.txt");
             Console.WriteLine(Day04.Part2(input).ToString());
         }
     }
