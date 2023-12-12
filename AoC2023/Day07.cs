@@ -2,37 +2,6 @@
 {
     internal class Day07
     {
-        static List<string> Debug(List<(List<int> cardVals, int bid, Type type)> list)
-        {
-            var ret = new List<string>();
-            string buffer = "";
-            foreach(var item in list)
-            {
-                foreach(var num in item.cardVals)
-                {
-                    string c = num switch
-                    {
-                        10 => "T",
-                        1 => "J",
-                        12 => "Q",
-                        13 => "K",
-                        14 => "A",
-                        _ => num.ToString()
-                    };
-
-                    buffer += c;
-                }
-                buffer += "\t";
-                buffer += item.bid.ToString();
-                buffer += "\t";
-                buffer += item.type.ToString();
-                
-                if(item.cardVals.Contains(1))
-                    ret.Add(buffer);
-                buffer = "";
-            }
-            return ret;
-        }
         public enum Type
         {
             HighCard,
