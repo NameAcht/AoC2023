@@ -106,8 +106,7 @@
                 // ignore many joker cases because joker directly upgrades card type in those
                 var type = (distinctCount, yokerCount) switch
                 {
-                    (0, _) => Type.FiveOfKind,
-                    (1, _) => Type.FiveOfKind,
+                    ( <= 1, _) => Type.FiveOfKind,
                     (2, 0) => cardStr.Count(c => c == cardStr[0]) == 4 || cardStr.Count(c => c == cardStr[0]) == 1 ? Type.FourOfKind : Type.FullHouse,
                     (3, 0) => cardStr.Any(c => cardStr.Count(card => card == c) == 3) ? Type.ThreeOfKind : Type.TwoPair,
                     (4, _) => Type.OnePair,
