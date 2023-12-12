@@ -8,11 +8,11 @@
         }
         static long lcm(long a, long b)
         {
-            return Math.Abs(a * b) / GreatestCommonDenominator(a, b);
+            return Math.Abs(a * b) / GreatestCommonDivisor(a, b);
         }
-        static long GreatestCommonDenominator(long a, long b)
+        static long GreatestCommonDivisor(long a, long b)
         {
-            return b == 0 ? a : GreatestCommonDenominator(b, a % b);
+            return b == 0 ? a : GreatestCommonDivisor(b, a % b);
         }
         public static Dictionary<string, (string left, string right)> ParseNodes(string[] input)
         {
@@ -31,13 +31,6 @@
                 if (node.Key.EndsWith(endChar))
                     startingNodes.Add(node.Value);
             return startingNodes;
-        }
-        public static int[] InitMaxArr(int arrSize)
-        {
-            int[] arr = new int[arrSize];
-            for (int i = 0; i < arr.Length; i++)
-                arr[i] = int.MaxValue;
-            return arr;
         }
         public static int Part1(string[] input)
         {
