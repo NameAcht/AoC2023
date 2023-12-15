@@ -1,11 +1,12 @@
-﻿using System.Diagnostics.Contracts;
-using System.Runtime.CompilerServices;
-using System.Xml;
+﻿using System.Collections.Generic;
+using System.Diagnostics.Metrics;
+using System.Text;
 
 namespace AoC2023
 {
     internal class Day10
     {
+        const char CONNECTOR = '+';
         public enum Direction
         {
             Up, Right, Down, Left
@@ -42,6 +43,58 @@ namespace AoC2023
             if (legend.TryGetValue((left, Direction.Left), out dir))
                 return Direction.Left;
             throw new NotImplementedException("bruh");
+        }
+        public static char GetStartChar(string[] map, int startRow, int startCol)
+        {
+            char up = startRow > 0 ? map[startRow - 1][startCol] : '.';
+            char down = startRow < map.Length - 1 ? map[startRow + 1][startCol] : '.';
+            char left = startCol > 0 ? map[startRow][startCol - 1] : '.';
+            char right = startCol < map[startRow].Length - 1 ? map[startRow][startCol + 1] : '.';
+
+            bool isUp = false;
+            bool isDown = false;
+            bool isLeft = false;
+            bool isRight = false;
+
+            if (up == 'F' || up == '|' || up == '7')
+                isUp = true;
+            if (down == 'J' || down == '|' || down == 'L')
+                isDown = true;
+            if (left == 'F' || left == '-' || left == 'L')
+                isLeft = true;
+            if (right == 'J' || right == '-' || right == '7')
+                isRight = true;
+
+            char ret = (isUp, isDown, isLeft, isRight) switch
+            {
+                (true, true, false, false) => '|',
+                (true, false, true, false) => 'J',
+                (true, false, false, true) => 'L',
+                (false, true, true, false) => '7',
+                (false, true, false, true) => 'F',
+                (false, false, true, true) => '-',
+                _ => throw new NotImplementedException()
+            };
+            return ret;
+        }
+        public static void EditExtensionChar(StringBuilder[] expandedMap, int rowIter, int colIter)
+        {
+            char up = expandedMap[rowIter - 1][colIter];
+            char down = expandedMap[rowIter + 1][colIter];
+            char left = expandedMap[rowIter][colIter - 1];
+            char right = expandedMap[rowIter][colIter + 1];
+
+            bool connectsUp = up == '|' || up == 'F' || up == '7';
+            bool connectsDown = down == '|' || down == 'J' || down == 'L';
+            bool connectsLeft = left == '-' || left == 'F' || left == 'L';
+            bool connectsRight = right == '-' || right == 'J' || right == '7';
+
+            expandedMap[rowIter][colIter] = (connectsUp, connectsDown, connectsLeft, connectsRight) switch
+            {
+                (true, true, false, false) => '|',
+                (false, false, true, true) => '-',
+                _ => '+'
+            };
         }
         public static int Part1(string[] map)
         {
@@ -105,11 +158,44 @@ namespace AoC2023
                 [('F', Direction.Up)] = Direction.Right,
             };
 
-            var currDir = GetStartDirection(map, currRow, currCol, legend);
 
+
+            var expandedMap = new StringBuilder[map.Length * 2 + 1];
+            expandedMap[0] = new StringBuilder(new string(CONNECTOR, map[0].Length));
+
+            for (int i = 0; i < expandedMap.Length - 1; i++)
+            {
+                if (i % 2 != 0)
+                    expandedMap[i + 1] = new StringBuilder(new string(CONNECTOR, map[0].Length));
+                else
+                    expandedMap[i + 1] = new StringBuilder(map[i / 2]);
+            }
+
+            foreach(var line in expandedMap)
+            {
+                for (int i = 0; i < line.Length; i += 2)
+                    line.Insert(i, CONNECTOR);
+                line.Append(CONNECTOR);
+            }
+
+            // set currRow and currCol to start index on new map, edit out S for extension pipe interpreting
+            currRow = expandedMap.ToList().FindIndex(line => line.ToString().Contains('S'));
+            currCol = expandedMap[currRow].ToString().IndexOf('S');
+            expandedMap[currRow][currCol] = GetStartChar(map, currRow / 2, currCol / 2);
+
+            // add in extension pipes
+            for (int rowIter = 1; rowIter < expandedMap.Length - 1; rowIter++)
+                for (int colIter = 1; colIter < expandedMap[rowIter].Length - 1; colIter++)
+                    if (expandedMap[rowIter][colIter] == '+')
+                        EditExtensionChar(expandedMap, rowIter, colIter);
+
+            // edit S back in for traversing
+            expandedMap[currRow][currCol] = 'S';
+
+            var currDir = GetStartDirection(expandedMap.ToList().ConvertAll(line => line.ToString()).ToArray(), currRow, currCol, legend);
             var isLoop = new HashSet<(int row, int col)>();
 
-            int steps = 0;
+            // traverse new map
             do
             {
                 switch (currDir)
@@ -120,15 +206,28 @@ namespace AoC2023
                     case Direction.Right: currCol++; break;
                     default: throw new NotImplementedException();
                 }
-                var newPipe = map[currRow][currCol];
+                var newPipe = expandedMap[currRow][currCol];
                 legend.TryGetValue((newPipe, currDir), out currDir);
 
-                steps++;
-            } while (map[currRow][currCol] != 'S');
+                isLoop.Add((currRow, currCol));
 
-            Print(map, isLoop);
+            } while (expandedMap[currRow][currCol] != 'S');
 
-            return steps / 2;
+
+            foreach(var line in expandedMap)
+            {
+                foreach(var c in line.ToString())
+                {
+                    if(c == '.')
+                    {
+
+                    }
+                }
+            }
+
+            Print(expandedMap.ToList().ConvertAll(line => line.ToString()).ToArray(), isLoop);
+
+            return 0;
         }
     }
 }
