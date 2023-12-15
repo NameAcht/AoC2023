@@ -1,0 +1,14 @@
+F:\repos\AoC2023\AoC2023\bin\Release\net7.0\AoC2023.exe
+F:\repos\AoC2023\AoC2023\bin\Release\net7.0\AoC2023.deps.json
+F:\repos\AoC2023\AoC2023\bin\Release\net7.0\AoC2023.runtimeconfig.json
+F:\repos\AoC2023\AoC2023\bin\Release\net7.0\AoC2023.dll
+F:\repos\AoC2023\AoC2023\bin\Release\net7.0\AoC2023.pdb
+F:\repos\AoC2023\AoC2023\obj\Release\net7.0\AoC2023.GeneratedMSBuildEditorConfig.editorconfig
+F:\repos\AoC2023\AoC2023\obj\Release\net7.0\AoC2023.AssemblyInfoInputs.cache
+F:\repos\AoC2023\AoC2023\obj\Release\net7.0\AoC2023.AssemblyInfo.cs
+F:\repos\AoC2023\AoC2023\obj\Release\net7.0\AoC2023.csproj.CoreCompileInputs.cache
+F:\repos\AoC2023\AoC2023\obj\Release\net7.0\AoC2023.dll
+F:\repos\AoC2023\AoC2023\obj\Release\net7.0\refint\AoC2023.dll
+F:\repos\AoC2023\AoC2023\obj\Release\net7.0\AoC2023.pdb
+F:\repos\AoC2023\AoC2023\obj\Release\net7.0\AoC2023.genruntimeconfig.cache
+F:\repos\AoC2023\AoC2023\obj\Release\net7.0\ref\AoC2023.dll

@@ -17,13 +17,13 @@
         public static int Part1(string[] input)
         {
             int sum = 0;
-            var ascii = new char[26];
-            for (int i = 0; i < ascii.Length; i++)
-                ascii[i] = (char)(i + 97);
+            var letters = new char[26];
+            for (int i = 0; i < letters.Length; i++)
+                letters[i] = (char)(i + 97);
 
             foreach (var line in input)
             {
-                var numbers = line.ToLowerInvariant().Trim(ascii);
+                var numbers = line.ToLowerInvariant().Trim(letters);
                 sum += int.Parse(numbers.First().ToString() + numbers.Last().ToString());
             }
             return sum;
