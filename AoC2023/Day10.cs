@@ -11,20 +11,24 @@ namespace AoC2023
         {
             Up, Right, Down, Left
         }
-        public static void Print(string[] map, HashSet<(int row, int col)> isLoop)
+        public static Dictionary<(char pipe, Direction entry), Direction> DirectionsFromState()
         {
-            for (int i = 0; i < map.Length; i++)
+            var hashMap = new Dictionary<(char pipe, Direction entry), Direction>()
             {
-                for (int j = 0; j < map[i].Length; j++)
-                {
-                    if(isLoop.Contains((i, j)))
-                        Console.ForegroundColor = ConsoleColor.Blue;
-
-                    Console.Write(map[i][j]);
-                    Console.ForegroundColor = ConsoleColor.White;
-                }
-                Console.WriteLine();
-            }
+                [('|', Direction.Up)] = Direction.Up,
+                [('|', Direction.Down)] = Direction.Down,
+                [('-', Direction.Left)] = Direction.Left,
+                [('-', Direction.Right)] = Direction.Right,
+                [('L', Direction.Down)] = Direction.Right,
+                [('L', Direction.Left)] = Direction.Up,
+                [('J', Direction.Right)] = Direction.Up,
+                [('J', Direction.Down)] = Direction.Left,
+                [('7', Direction.Right)] = Direction.Down,
+                [('7', Direction.Up)] = Direction.Left,
+                [('F', Direction.Left)] = Direction.Down,
+                [('F', Direction.Up)] = Direction.Right,
+            };
+            return hashMap;
         }
         public static Direction GetStartDirection(string[] map, int startRow, int startCol, Dictionary<(char pipe, Direction entry), Direction> legend)
         {
@@ -142,36 +146,21 @@ namespace AoC2023
             var currRow = map.ToList().FindIndex(line => line.Contains('S'));
             var currCol = map[currRow].IndexOf('S');
 
-            var legend = new Dictionary<(char pipe, Direction entry), Direction>()
-            {
-                [('|', Direction.Up)] = Direction.Up,
-                [('|', Direction.Down)] = Direction.Down,
-                [('-', Direction.Left)] = Direction.Left,
-                [('-', Direction.Right)] = Direction.Right,
-                [('L', Direction.Down)] = Direction.Right,
-                [('L', Direction.Left)] = Direction.Up,
-                [('J', Direction.Right)] = Direction.Up,
-                [('J', Direction.Down)] = Direction.Left,
-                [('7', Direction.Right)] = Direction.Down,
-                [('7', Direction.Up)] = Direction.Left,
-                [('F', Direction.Left)] = Direction.Down,
-                [('F', Direction.Up)] = Direction.Right,
-            };
+            var stateMap = DirectionsFromState();
 
+            var bigMap = new StringBuilder[map.Length * 2 + 1];
+            bigMap[0] = new StringBuilder(new string(CONNECTOR, map[0].Length));
 
-
-            var expandedMap = new StringBuilder[map.Length * 2 + 1];
-            expandedMap[0] = new StringBuilder(new string(CONNECTOR, map[0].Length));
-
-            for (int i = 0; i < expandedMap.Length - 1; i++)
+            // insert missing spaces into map
+            for (int i = 0; i < bigMap.Length - 1; i++)
             {
                 if (i % 2 != 0)
-                    expandedMap[i + 1] = new StringBuilder(new string(CONNECTOR, map[0].Length));
+                    bigMap[i + 1] = new StringBuilder(new string(CONNECTOR, map[0].Length));
                 else
-                    expandedMap[i + 1] = new StringBuilder(map[i / 2]);
+                    bigMap[i + 1] = new StringBuilder(map[i / 2]);
             }
 
-            foreach(var line in expandedMap)
+            foreach(var line in bigMap)
             {
                 for (int i = 0; i < line.Length; i += 2)
                     line.Insert(i, CONNECTOR);
@@ -179,21 +168,21 @@ namespace AoC2023
             }
 
             // set currRow and currCol to start index on new map, edit out S for extension pipe interpreting
-            currRow = expandedMap.ToList().FindIndex(line => line.ToString().Contains('S'));
-            currCol = expandedMap[currRow].ToString().IndexOf('S');
-            expandedMap[currRow][currCol] = GetStartChar(map, currRow / 2, currCol / 2);
+            currRow = bigMap.ToList().FindIndex(line => line.ToString().Contains('S'));
+            currCol = bigMap[currRow].ToString().IndexOf('S');
+            bigMap[currRow][currCol] = GetStartChar(map, currRow / 2, currCol / 2);
 
             // add in extension pipes
-            for (int rowIter = 1; rowIter < expandedMap.Length - 1; rowIter++)
-                for (int colIter = 1; colIter < expandedMap[rowIter].Length - 1; colIter++)
-                    if (expandedMap[rowIter][colIter] == '+')
-                        EditExtensionChar(expandedMap, rowIter, colIter);
+            for (int rowIter = 1; rowIter < bigMap.Length - 1; rowIter++)
+                for (int colIter = 1; colIter < bigMap[rowIter].Length - 1; colIter++)
+                    if (bigMap[rowIter][colIter] == '+')
+                        EditExtensionChar(bigMap, rowIter, colIter);
 
             // edit S back in for traversing
-            expandedMap[currRow][currCol] = 'S';
+            bigMap[currRow][currCol] = 'S';
 
-            var currDir = GetStartDirection(expandedMap.ToList().ConvertAll(line => line.ToString()).ToArray(), currRow, currCol, legend);
-            var isLoop = new HashSet<(int row, int col)>();
+            var currDir = GetStartDirection(bigMap.ToList().ConvertAll(line => line.ToString()).ToArray(), currRow, currCol, stateMap);
+            var loopCoords = new HashSet<(int row, int col)>();
 
             // traverse new map
             do
@@ -206,28 +195,45 @@ namespace AoC2023
                     case Direction.Right: currCol++; break;
                     default: throw new NotImplementedException();
                 }
-                var newPipe = expandedMap[currRow][currCol];
-                legend.TryGetValue((newPipe, currDir), out currDir);
+                var newPipe = bigMap[currRow][currCol];
+                stateMap.TryGetValue((newPipe, currDir), out currDir);
 
-                isLoop.Add((currRow, currCol));
+                loopCoords.Add((currRow, currCol));
+            } while (bigMap[currRow][currCol] != 'S');
 
-            } while (expandedMap[currRow][currCol] != 'S');
 
+            // get tiles outside loop
+            var outsideCoords = new HashSet<(int row, int col)>();
+            var queue = new Queue<(int row, int col)>();
+            queue.Enqueue((0, 0));
 
-            foreach(var line in expandedMap)
+            // Bfs to get all outside tiles
+            while (queue.Count > 0)
             {
-                foreach(var c in line.ToString())
-                {
-                    if(c == '.')
-                    {
+                var curr = queue.Dequeue();
 
-                    }
-                }
+                if (outsideCoords.Contains(curr))
+                    continue;
+                else
+                    outsideCoords.Add(curr); 
+
+                // enqueue tiles if inside bounds and not loop
+                if (curr.row > 0 && !loopCoords.Contains((curr.row - 1, curr.col)))
+                    queue.Enqueue((curr.row - 1, curr.col));
+                if (curr.row < bigMap.Length - 1 && !loopCoords.Contains((curr.row + 1, curr.col)))
+                    queue.Enqueue((curr.row + 1, curr.col));
+                if (curr.col > 0 && !loopCoords.Contains((curr.row, curr.col - 1)))
+                    queue.Enqueue((curr.row, curr.col - 1));
+                if (curr.col < bigMap[0].Length && !loopCoords.Contains((curr.row, curr.col + 1)))
+                    queue.Enqueue((curr.row, curr.col + 1));
             }
 
-            Print(expandedMap.ToList().ConvertAll(line => line.ToString()).ToArray(), isLoop);
-
-            return 0;
+            int sum = 0;
+            for (int rowIter = 1; rowIter < bigMap.Length - 1; rowIter += 2)
+                for (int colIter = 1; colIter < bigMap[rowIter].Length - 1; colIter += 2)
+                    if (!loopCoords.Contains((rowIter, colIter)) && !outsideCoords.Contains((rowIter, colIter)))
+                        sum++;
+            return sum;
         }
     }
 }
