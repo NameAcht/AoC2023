@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Diagnostics.Metrics;
-using System.Text;
+﻿using System.Text;
 
 namespace AoC2023
 {
@@ -10,6 +8,28 @@ namespace AoC2023
         public enum Direction
         {
             Up, Right, Down, Left
+        }
+        public static int TraversePipe(string[] map, Dictionary<(char pipe, Direction entry), Direction> stateMap, Direction currDir, int currRow, int currCol, out HashSet<(int ,int)> loopCoords)
+        {
+            int steps = 0;
+            loopCoords = new HashSet<(int ,int)>();
+            do
+            {
+                switch (currDir)
+                {
+                    case Direction.Up: currRow--; break;
+                    case Direction.Down: currRow++; break;
+                    case Direction.Left: currCol--; break;
+                    case Direction.Right: currCol++; break;
+                    default: throw new NotImplementedException();
+                }
+                var newPipe = map[currRow][currCol];
+                stateMap.TryGetValue((newPipe, currDir), out currDir);
+
+                loopCoords.Add((currRow, currCol));
+                steps++;
+            } while (map[currRow][currCol] != 'S');
+            return steps;
         }
         public static Dictionary<(char pipe, Direction entry), Direction> DirectionsFromState()
         {
@@ -105,39 +125,11 @@ namespace AoC2023
             var currRow = map.ToList().FindIndex(line => line.Contains('S'));
             var currCol = map[currRow].IndexOf('S');
 
-            var legend = new Dictionary<(char pipe, Direction entry), Direction>()
-            {
-                [('|', Direction.Up)] = Direction.Up,
-                [('|', Direction.Down)] = Direction.Down,
-                [('-', Direction.Left)] = Direction.Left,
-                [('-', Direction.Right)] = Direction.Right,
-                [('L', Direction.Down)] = Direction.Right,
-                [('L', Direction.Left)] = Direction.Up,
-                [('J', Direction.Right)] = Direction.Up,
-                [('J', Direction.Down)] = Direction.Left,
-                [('7', Direction.Right)] = Direction.Down,
-                [('7', Direction.Up)] = Direction.Left,
-                [('F', Direction.Left)] = Direction.Down,
-                [('F', Direction.Up)] = Direction.Right,
-            };
+            var stateMap = DirectionsFromState();
 
-            var currDir = GetStartDirection(map, currRow, currCol, legend);
-        
-            int steps = 0;
-            do
-            {
-                switch (currDir)
-                {
-                    case Direction.Up: currRow--; break;
-                    case Direction.Down: currRow++; break;
-                    case Direction.Left: currCol--; break;
-                    case Direction.Right: currCol++; break;
-                    default: throw new NotImplementedException();
-                }
-                var newPipe = map[currRow][currCol];
-                legend.TryGetValue((newPipe, currDir), out currDir);
-                steps++;
-            } while (map[currRow][currCol] != 'S');
+            var currDir = GetStartDirection(map, currRow, currCol, stateMap);
+
+            int steps = TraversePipe(map, stateMap, currDir, currRow, currCol, out var loopCoords);
 
             return steps / 2;
         }
@@ -182,27 +174,9 @@ namespace AoC2023
             bigMap[currRow][currCol] = 'S';
 
             var currDir = GetStartDirection(bigMap.ToList().ConvertAll(line => line.ToString()).ToArray(), currRow, currCol, stateMap);
-            var loopCoords = new HashSet<(int row, int col)>();
 
-            // traverse new map
-            do
-            {
-                switch (currDir)
-                {
-                    case Direction.Up: currRow--; break;
-                    case Direction.Down: currRow++; break;
-                    case Direction.Left: currCol--; break;
-                    case Direction.Right: currCol++; break;
-                    default: throw new NotImplementedException();
-                }
-                var newPipe = bigMap[currRow][currCol];
-                stateMap.TryGetValue((newPipe, currDir), out currDir);
+            TraversePipe(bigMap.ToList().ConvertAll(line => line.ToString()).ToArray(), stateMap, currDir, currRow, currCol, out var loopCoords);
 
-                loopCoords.Add((currRow, currCol));
-            } while (bigMap[currRow][currCol] != 'S');
-
-
-            // get tiles outside loop
             var outsideCoords = new HashSet<(int row, int col)>();
             var queue = new Queue<(int row, int col)>();
             queue.Enqueue((0, 0));
@@ -228,6 +202,9 @@ namespace AoC2023
                     queue.Enqueue((curr.row, curr.col + 1));
             }
 
+            /////////////////////////////////////////////////////////////////////////
+
+            // sum up all tiles, that are not outside loop and not part of loop
             int sum = 0;
             for (int rowIter = 1; rowIter < bigMap.Length - 1; rowIter += 2)
                 for (int colIter = 1; colIter < bigMap[rowIter].Length - 1; colIter += 2)
