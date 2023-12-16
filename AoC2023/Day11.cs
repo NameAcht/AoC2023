@@ -4,50 +4,40 @@ namespace AoC2023
 {
     internal class Day11
     {
-        public static string[] ExpandMap(string[] input)
+        public static long GetSum(string[] input, int expand)
         {
-            var mutMap = input.ToList().ConvertAll(line => new StringBuilder(line));
-
-            // add lines
-            for (int i = 0; i < mutMap.Count - 1; i++)
-            {
-                var line = mutMap[i];
-                if (!line.ToString().Contains('#'))
-                {
-                    mutMap.Insert(i, new StringBuilder(new string('.', line.Length)));
-                    i++;
-                }
-            }
-
-            // add cols
-            for (int i = 0; i < mutMap[0].Length - 1; i++)
-            {
-                if (!mutMap.Any(line => line[i] == '#'))
-                {
-                    foreach (var line in mutMap)
-                        line.Insert(i, '.');
-                    i++;
-                }
-            }
-
-            return mutMap.ConvertAll(line => line.ToString()).ToArray();
-        }
-        public static int Part1(string[] input)
-        {
-            var map = ExpandMap(input);
-
             var galaxies = new List<(int row, int col)>();
+            var emptyRows = new List<int>();
+            var emptyCols = new List<int>();
 
-            foreach (var line in map)
-                Console.WriteLine(line);
+            // get empty rows
+            for (int i = 0; i < input.Length; i++)
+                if (!input[i].Contains('#'))
+                    emptyRows.Add(i);
 
-            return 0;
+            // get empty cols
+            for (int i = 0; i < input[0].Length; i++)
+                if (input.All(line => line[i] == '.'))
+                    emptyCols.Add(i);
+
+            // get galaxies
+            for (int i = 0; i < input.Length; i++)
+                for (int j = 0; j < input[i].Length; j++)
+                    if (input[i][j] == '#')
+                        galaxies.Add((i, j));
+
+            long sum = 0;
+            for (int i = 0; i < galaxies.Count - 1; i++)
+                for (int j = i + 1; j < galaxies.Count; j++)
+                {
+                    sum += Math.Abs(galaxies[i].row - galaxies[j].row) + Math.Abs(galaxies[i].col - galaxies[j].col);
+                    sum += emptyRows.Where(row => row > galaxies[i].row && row < galaxies[j].row).Count() * (expand - 1);
+                    sum += emptyCols.Where(col => (col > galaxies[i].col && col < galaxies[j].col) || (col > galaxies[j].col && col < galaxies[i].col)).Count() * (expand - 1);
+                }
+
+            return sum;
         }
-        public static int Part2(string[] input)
-        {
-
-
-            return 0;
-        }
+        public static long Part1(string[] input) => GetSum(input, 2);
+        public static long Part2(string[] input) => GetSum(input, 1000000);
     }
 }
