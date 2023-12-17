@@ -1,6 +1,4 @@
-﻿using System.ComponentModel;
-
-namespace AoC2023
+﻿namespace AoC2023
 {
     internal class Day06
     {

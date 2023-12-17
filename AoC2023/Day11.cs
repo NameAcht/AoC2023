@@ -1,6 +1,4 @@
-﻿using System.Text;
-
-namespace AoC2023
+﻿namespace AoC2023
 {
     internal class Day11
     {
