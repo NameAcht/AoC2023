@@ -31,7 +31,6 @@
                 int toAdd = amount - springs.Where(c => c == '#').Count();
 
                 
-                
                 int knownMask = 0;
                 int unknownMask = 0;
                 int brokeMask = 0;
@@ -58,9 +57,9 @@
                 }
 
 
-                int max = FindLargestBit(unknownMask);
-                
-                
+                int max = FindLargestBit(unknownMask) - 1;
+
+
             }
 
             return sum;
