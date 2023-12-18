@@ -10,6 +10,9 @@ currStr			"01110000100010"	string
 
 8150 too high
 8149
+8148
+8147
+8146
 8100
 8000 too low
 7500 too low

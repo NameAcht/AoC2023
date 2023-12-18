@@ -41,3 +41,4 @@ C:\Users\admin\Source\Repos\AoC2023\AoC2023\obj\Debug\net7.0\refint\AoC2023.dll
 C:\Users\admin\Source\Repos\AoC2023\AoC2023\obj\Debug\net7.0\AoC2023.pdb
 C:\Users\admin\Source\Repos\AoC2023\AoC2023\obj\Debug\net7.0\AoC2023.genruntimeconfig.cache
 C:\Users\admin\Source\Repos\AoC2023\AoC2023\obj\Debug\net7.0\ref\AoC2023.dll
+C:\Daten\Johannes\repos\AoC2023\AoC2023\obj\Debug\net7.0\AoC2023.sourcelink.json
