@@ -1,10 +1,8 @@
-﻿using System.Text;
-
-namespace AoC2023
+﻿namespace AoC2023
 {
     internal class Day12
     {
-        public static List<int> GetBitGroups(int n)
+        public static List<int> GetBitGroups(long n)
         {
             var list = new List<int>();
             
@@ -24,13 +22,13 @@ namespace AoC2023
             list.Add(groupCount);
             return list;
         }
-        public static int GetBitCount(int n)
+        public static long GetBitCount(long n)
         {
-            int bitCount = 0;
+            long bitCount = 0;
             while (n > 0)
             {
                 bitCount++;
-                n = n & (n - 1);
+                n &= (n - 1);
             }
             return bitCount;
         }
@@ -61,11 +59,10 @@ namespace AoC2023
                 int amount = cfg.Sum();
                 int toAdd = amount - springs.Where(c => c == '#').Count();
                 
-                int knownMask = 0;
-                int unknownMask = 0;
-                int springMask = 0;
-                int funcMask = 0;
-
+                long knownMask = 0;
+                long unknownMask = 0;
+                long springMask = 0;
+                long funcMask = 0;
                 for (int i = 0; i < springs.Length; i++)
                 {
                     if (springs[i] != '?')
@@ -80,9 +77,10 @@ namespace AoC2023
                     if (springs[i] == '?')
                         unknownMask += 1 << i;
                 }
+                
 
-                int max = springMask | unknownMask;
-                for (int i = springMask; i <= max; i++)
+                long max = springMask | unknownMask;
+                for (long i = springMask; i <= max; i++)
                 {
                     if ((i & funcMask) > 0)
                         continue;

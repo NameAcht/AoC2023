@@ -1,0 +1,18 @@
+knownMask		"11101110011001"	string
+funcMask		"10001110011001"	string
+brokeMask		"01100000000000"	string
+unknownMask		"00010001100110"	string
+currStr			"01110000100010"	string
+
+
+010101010101010
+011111101011101
+
+8150 too high
+8149
+8148
+8147
+8146
+8100
+8000 too low
+7500 too low
