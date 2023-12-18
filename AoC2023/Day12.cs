@@ -7,8 +7,7 @@ namespace AoC2023
         public static List<int> GetBitGroups(int n)
         {
             var list = new List<int>();
-            string debug = Convert.ToString(n, 2);
-
+            
             int groupCount = 0;
             while (n > 0)
             {
@@ -49,7 +48,8 @@ namespace AoC2023
         }
         public static long Part1(string[] input)
         {
-            int sum = 0;
+            long sum = 0;
+            var bitGroups = new List<int>();
             foreach (var line in input)
             {
                 var cfg = new List<int>();
@@ -93,8 +93,8 @@ namespace AoC2023
                     if (GetBitCount(i ^ springMask) != toAdd)
                         continue;
 
-                    var bitGroups = GetBitGroups(i);
-                    if (!GetBitGroups(i).SequenceEqual(cfg))
+                    bitGroups = GetBitGroups(i);
+                    if (!bitGroups.SequenceEqual(cfg))
                         continue;
 
                     sum++;
