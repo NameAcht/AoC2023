@@ -12,3 +12,4 @@ F:\repos\AoC2023\AoC2023\obj\Release\net7.0\refint\AoC2023.dll
 F:\repos\AoC2023\AoC2023\obj\Release\net7.0\AoC2023.pdb
 F:\repos\AoC2023\AoC2023\obj\Release\net7.0\AoC2023.genruntimeconfig.cache
 F:\repos\AoC2023\AoC2023\obj\Release\net7.0\ref\AoC2023.dll
+F:\repos\AoC2023\AoC2023\obj\Release\net7.0\AoC2023.sourcelink.json

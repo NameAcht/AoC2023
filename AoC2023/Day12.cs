@@ -5,45 +5,42 @@ namespace AoC2023
 {
     internal class Day12
     {
-        // ???
-        static long ProcessHash(string pattern, ImmutableStack<int> nums, Cache cache)
+        public static long ProcessDamagedSpring(string pattern, ImmutableStack<int> nums, Cache cache)
         {
             if (!nums.Any())
-            {
-                return 0; // no more numbers left, this is no good
-            }
+                return 0;
 
-            var n = nums.Peek();
+            int currGroupSize = nums.Peek();
             nums = nums.Pop();
 
-            var potentiallyDead = pattern.TakeWhile(s => s == '#' || s == '?').Count();
-            
-            if (potentiallyDead < n)
-            {
-                return 0; // not enough dead springs 
-            }
-            else if (pattern.Length == n)
-            {
-                return EvalPattern("", nums, cache);
-            }
-            else if (pattern[n] == '#')
-            {
-                return 0; // dead spring follows the range -> not good
-            }
+            // highest potential amount of damaged springs for this group
+            int maxDamagedSprings = pattern.TakeWhile(c => c == '#' || c == '?').Count();
+
+            // current group larger than whats possible -> impossible pattern
+            if (maxDamagedSprings < currGroupSize)
+                return 0;
+            // if currGroup == maxSprings == patternLength, theres only one possible group (all damaged)
+            // if no groups are left return 0
+            else if (pattern.Length == currGroupSize)
+                return nums.Any() ? 0 : 1;
+            // damaged spring follows current group,
+            // for example -> groupSize is 5, pattern is #????#
+            // a pattern of 5 is not possible here
+            else if (pattern[currGroupSize] == '#')
+                return 0;
+            // continue to pattern after damaged spring group
             else
-            {
-                return EvalPattern(pattern[(n + 1)..], nums, cache);
-            }
+                return EvalPattern(pattern[(currGroupSize + 1)..], nums, cache);
         }
-        static long EvalPattern(string pattern, ImmutableStack<int> nums, Cache cache)
+        public static long EvalPattern(string pattern, ImmutableStack<int> nums, Cache cache)
         {
-            if (!cache.ContainsKey((pattern, nums)))
+            if(!cache.ContainsKey((pattern, nums)))
             {
                 cache[(pattern, nums)] = pattern.FirstOrDefault() switch
                 {
                     '.' => EvalPattern(pattern[1..], nums, cache),
-                    '?' => EvalPattern("." + pattern[1..], nums, cache) + EvalPattern("#" + pattern[1..], nums, cache),
-                    '#' => ProcessHash(pattern, nums, cache),
+                    '?' => EvalPattern('.' + pattern[1..], nums, cache) + EvalPattern('#' + pattern[1..], nums, cache),
+                    '#' => ProcessDamagedSpring(pattern, nums, cache),
                     _ => nums.Any() ? 0 : 1
                 };
             }
@@ -113,7 +110,6 @@ namespace AoC2023
                     if (springs[i] == '?')
                         unknownMask += 1 << i;
                 }
-
 
                 long max = springMask | unknownMask;
                 for (long i = springMask; i <= max; i++)

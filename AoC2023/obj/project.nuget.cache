@@ -1,13 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "Y8i1WR57KLIEL2hYw23e0Da4QFmeMMj2D8IYoouRMXre5fWlDazf53FxMz3kgoNese7dvZm5SYHu3/2mY5o8og==",
+  "dgSpecHash": "sWnL9JTSB7aIp+hSIZ0wJbhhqpCOP3o60H2FVi/rUvzVBCdEJ1MNFE+eZ5/imWKD4QN4INS1AGLD9kshyWTk9A==",
   "success": true,
-  "projectFilePath": "C:\\Daten\\Johannes\\repos\\AoC2023\\AoC2023\\AoC2023.csproj",
-  "expectedPackageFiles": [
-    "C:\\Users\\admin\\.nuget\\packages\\microsoft.windowsdesktop.app.ref\\7.0.14\\microsoft.windowsdesktop.app.ref.7.0.14.nupkg.sha512",
-    "C:\\Users\\admin\\.nuget\\packages\\microsoft.netcore.app.ref\\7.0.14\\microsoft.netcore.app.ref.7.0.14.nupkg.sha512",
-    "C:\\Users\\admin\\.nuget\\packages\\microsoft.aspnetcore.app.ref\\7.0.14\\microsoft.aspnetcore.app.ref.7.0.14.nupkg.sha512",
-    "C:\\Users\\admin\\.nuget\\packages\\microsoft.netcore.app.host.win-x64\\7.0.14\\microsoft.netcore.app.host.win-x64.7.0.14.nupkg.sha512"
-  ],
+  "projectFilePath": "F:\\repos\\AoC2023\\AoC2023\\AoC2023.csproj",
+  "expectedPackageFiles": [],
   "logs": []
 }
