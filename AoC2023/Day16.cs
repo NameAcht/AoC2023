@@ -4,8 +4,8 @@ using StateSet = System.Collections.Generic.HashSet<(int, int, AoC2023.Day16.Dir
 
 namespace AoC2023
 {
-	internal class Day16
-	{
+    internal class Day16
+    {
         public enum Direction
         {
             Up, Left, Down, Right
