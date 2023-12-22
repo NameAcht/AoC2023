@@ -37,8 +37,8 @@ namespace AoC2023
 
 			// sum lens powers
 			for (int i = 0; i < boxes.Length; i++)
-                for (int j = 0; j < boxes[i].Count; j++)
-                    sum += (j + 1) * (i + 1) * boxes[i][j].lens;
+				for (int j = 0; j < boxes[i].Count; j++)
+					sum += (j + 1) * (i + 1) * boxes[i][j].lens;
 			
 			return sum;
 		}
