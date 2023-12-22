@@ -9,7 +9,7 @@ namespace AoC2023
 				currVal = (currVal + c) * 17 % 256;
 			return currVal;
 		}
-        public static int Part1(string input) => input.Split(',').Sum(entry => Hash(entry.Trim()));
+		public static int Part1(string input) => input.Split(',').Sum(entry => Hash(entry.Trim()));
 		public static int Part2(string input)
 		{
 			int sum = 0;
