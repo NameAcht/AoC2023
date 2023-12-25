@@ -1,0 +1,11 @@
+# Ignore all
+*
+
+# Unignore all with extensions
+!*.*
+
+# Unignore all dirs
+!*/
+
+# Unignore all `.cs` in `AoC2023` dir
+!*/AoC2023/*.cs
