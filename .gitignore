@@ -2,4 +2,4 @@
 *
 
 # Unignore all `.cs` in `AoC2023` dir
-!*/AoC2023/*.cs
+!AoC2023/*.cs
