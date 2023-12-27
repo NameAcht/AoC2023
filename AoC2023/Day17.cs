@@ -40,15 +40,8 @@ namespace AoC2023
 
                 return new State(newPos.row, newPos.col, newSteps, newHeatLoss, newDir);
             }
-            public override string ToString()
-            {
-                return row + "," + col + "," + dir + "," + dirSteps;
-            }
         }
-        public static int Mod(int x, int m)
-        {
-            return (x % m + m) % m;
-        }
+        public static int Mod(int x, int m) => (x % m + m) % m;
         public static bool OutOfBounds(string[] map, State state, Direction dir)
         {
             if (dir == Direction.Up && state.row <= 0)

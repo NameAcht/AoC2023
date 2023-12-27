@@ -2,10 +2,6 @@ namespace AoC2023
 {
 	internal class Day19
 	{
-        public enum Condition
-        {
-            Larger, Smaller
-        }
         public struct Item
         {
             public long x, m, a, s;
@@ -17,7 +13,62 @@ namespace AoC2023
                 this.s = s;
             }
             public long Sum { get => x + m + a + s; }
-            public override string ToString() => "x=" + x + " m=" + m + " a=" + a + " s=" + s;
+        }
+        public struct Bound
+        {
+            public long lower, upper;
+            public Bound(int lower, int upper)
+            {
+                this.lower = lower;
+                this.upper = upper;
+            }
+            public long Amount { get => upper - lower + 1; }
+            public Bound ProcessTrueBound(char condition, long right)
+            {
+                if (condition == '<')
+                    upper = Math.Min(upper, right - 1);
+                else
+                    lower = Math.Max(lower, right + 1);
+                return this;
+            }
+            public Bound ProcessFalseBound(char condition, long right)
+            {
+                if (condition == '<')
+                    lower = Math.Max(lower, right);
+                else
+                    upper = Math.Min(upper, right);
+                return this;
+            }
+            public override string ToString() => lower.ToString() + " - " + upper.ToString();
+        }
+        public struct State
+        {
+            public Bound x, m, a, s;
+            public string workflow;
+            public long Arrangements { get => x.Amount * m.Amount * a.Amount * s.Amount; }
+            public State ModifyTrueBound(char xmas, char condition, long right)
+            {
+                switch (xmas)
+                {
+                    case 'x': x = x.ProcessTrueBound(condition, right); break;
+                    case 'm': m = m.ProcessTrueBound(condition, right); break;
+                    case 'a': a = a.ProcessTrueBound(condition, right); break;
+                    case 's': s = s.ProcessTrueBound(condition, right); break;
+                }
+                return this;
+            }
+            public State ModifyFalseBound(char xmas, char condition, long right)
+            {
+                switch (xmas)
+                {
+                    case 'x': x = x.ProcessFalseBound(condition, right); break;
+                    case 'm': m = m.ProcessFalseBound(condition, right); break;
+                    case 'a': a = a.ProcessFalseBound(condition, right); break;
+                    case 's': s = s.ProcessFalseBound(condition, right); break;
+                }
+                return this;
+            }
+
         }
         public static List<Item> ParseItems(string[] input)
         {
@@ -42,6 +93,42 @@ namespace AoC2023
                 workflows.Add(line.Split(['{', '}'])[0], line.Split(['{', '}'])[1]);
             }
             return workflows;
+        }
+        public static long SolveState(State curr, Dictionary<string, string> workflows)
+        {
+            if (curr.workflow == "R")
+                return 0;
+            if (curr.workflow == "A")
+                return curr.Arrangements;
+
+            // case new workflow
+            if (!curr.workflow.Contains('<') && !curr.workflow.Contains('>'))
+            {
+                curr.workflow = workflows[curr.workflow];
+                return SolveState(curr, workflows);
+            }
+
+            // parse condition right side val
+            long rightSide = long.Parse(curr.workflow.Split(['<', '>', ':'])[1]);
+
+            var trueState = curr;
+            var falseState = curr;
+
+            // assign true workflow
+            var trueFlow = curr.workflow.Split([',', ':'])[1];
+            trueState.workflow = workflows.TryGetValue(trueFlow, out string newFlow) ? newFlow : trueFlow;
+
+            // assign false workflow
+            var falseFlow = curr.workflow.Substring(curr.workflow.IndexOf(',') + 1);
+            falseState.workflow = workflows.TryGetValue(falseFlow, out newFlow) ? newFlow : falseFlow;
+
+            char xmas = curr.workflow[0];
+            char condition = curr.workflow[1];
+
+            trueState = trueState.ModifyTrueBound(xmas, condition, rightSide);
+            falseState = falseState.ModifyFalseBound(xmas, condition, rightSide);
+
+            return SolveState(trueState, workflows) + SolveState(falseState, workflows);
         }
         public static long Part1(string[] input)
         {
@@ -97,10 +184,15 @@ namespace AoC2023
         public static long Part2(string[] input)
         {
             var workflows = ParseWorkflows(input);
-
-            // Recursion?
-
-            return 0;
+            var start = new State()
+            {
+                x = new Bound(1, 4000),
+                m = new Bound(1, 4000),
+                a = new Bound(1, 4000),
+                s = new Bound(1, 4000),
+                workflow = workflows["in"]
+            };
+            return SolveState(start, workflows);
         }
     }
 }
