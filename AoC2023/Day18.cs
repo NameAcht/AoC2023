@@ -1,10 +1,9 @@
-using System.Text;
 using System.Globalization;
 
 namespace AoC2023
 {
-	internal class Day18
-	{
+    internal class Day18
+    {
         public enum Direction
         {
             Up, Left, Down, Right
@@ -21,66 +20,56 @@ namespace AoC2023
             public Coord MoveLeft(long amount) => new Coord(row, col - amount);
             public Coord MoveDown(long amount) => new Coord(row + amount, col);
             public Coord MoveRight(long amount) => new Coord(row, col + amount);
-            public override string ToString() => row.ToString() + "," + col .ToString();
         }
         public struct Range
         {
             public Coord start;
             public Coord end;
             public Direction dir;
-            public long len;
-            public Range(Coord start, Coord end, Direction dir, long len)
+            public Range(Coord start, Coord end, Direction dir)
             {
                 this.start = start;
                 this.end = end;
                 this.dir = dir;
-                this.len = len;            
             }
-            public override string ToString() => start.ToString() + " ; " + end.ToString() + " " + dir + " " + len;
-        }
-        public static HashSet<Coord> DigPath(string[] input, out long minRow, out long minCol, out long maxRow, out long maxCol)
-		{
-            var set = new HashSet<Coord>();
-            minRow = long.MaxValue;
-            minCol = long.MaxValue;
-            maxRow = long.MinValue;
-            maxCol = long.MinValue;
-
-            var curr = new Coord(0, 0);
-            set.Add(curr);
-            foreach (var line in input)
+            // works only on right range and left range
+            public long RowOverlapAndReconstruct(Range left, List<Range> rRanges)
             {
-                long len = long.Parse(line.Split(' ')[1]);
-                string dir = line.Split(' ')[0];
-                for (long i = 1; i <= len; i++)
+                // left range contains right range
+                if (start.col >= left.end.col && end.col <= left.start.col)
+                    return end.col - start.col + 1;
+                // right range contains left range
+                else if (left.end.col >= start.col && left.start.col <= end.col)
                 {
-                    curr = dir switch
-                    {
-                        "U" => curr.MoveUp(1),
-                        "L" => curr.MoveLeft(1),
-                        "D" => curr.MoveDown(1),
-                        "R" => curr.MoveRight(1)
-                    };
-                    set.Add(curr);
+                    rRanges.Add(new Range(new Coord(start.row, start.col), new Coord(start.row, left.end.col - 1), Direction.Right));
+                    rRanges.Add(new Range(new Coord(start.row, left.start.col + 1), new Coord(start.row, end.col), Direction.Right));
+                    return left.start.col - left.end.col + 1;
                 }
-                minRow = Math.Min(minRow, curr.row);
-                minCol = Math.Min(minCol, curr.col);
-                maxRow = Math.Max(maxRow, curr.row);
-                maxCol = Math.Max(maxCol, curr.col);
+                // right bound partial overlap
+                else if (left.end.col >= start.col && left.end.col <= end.col)
+                {
+                    rRanges.Add(new Range(new Coord(start.row, start.col), new Coord(start.row, left.end.col - 1), Direction.Right));
+                    return end.col - left.end.col + 1;
+                }
+                // left bound partial overlap
+                else if (left.start.col >= start.col && left.start.col <= end.col)
+                {
+                    rRanges.Add(new Range(new Coord(start.row, left.start.col + 1), new Coord(start.row, end.col), Direction.Right));
+                    return left.start.col - start.col + 1;
+                }
+                // bug
+                return -1;
             }
-            return set;
         }
-        public static List<Range> DigPathRanges(string[] instr, out long minRow, out long minCol, out long maxRow, out long maxCol)
+        public static List<Range> DigPathRanges(string[] instr)
         {
             var ranges = new List<Range>();
-            minRow = long.MaxValue;
-            minCol = long.MaxValue;
-            maxRow = long.MinValue;
-            maxCol = long.MinValue;
 
             var curr = new Coord(0, 0);
-            foreach(var line in instr)
+            for (int i = 0; i < instr.Length; i++)
             {
+                var line = instr[i];
+
                 long len = long.Parse(line.Split(' ')[1]);
                 var end = line.Split(' ')[0] switch
                 {
@@ -99,18 +88,29 @@ namespace AoC2023
                     _ => throw new NotImplementedException()
                 };
 
-                ranges.Add(new Range(curr, end, dir, len));
+                // if right range, and next range is down range, subtract 1 pixel from end of current range
+                // however, keep old position for start of next range
+                // same thing with right range, and previous range being up range, add 1 to start
+                if (dir == Direction.Right)
+                {
+                    bool nextDown = instr[i + 1].Split(' ')[0] == "D";
+                    bool prevUp = i == 0 ? true : instr[i - 1].Split(' ')[0] == "U";
+
+                    if (nextDown && prevUp)
+                        ranges.Add(new Range(new Coord(curr.row, curr.col + 1), new Coord(end.row, end.col - 1), dir));
+                    else if (nextDown)
+                        ranges.Add(new Range(curr, new Coord(end.row, end.col - 1), dir));
+                    else if (prevUp)
+                        ranges.Add(new Range(new Coord(curr.row, curr.col + 1), end, dir));
+                    else
+                        ranges.Add(new Range(curr, end, dir));
+                }
+                else
+                    ranges.Add(new Range(curr, end, dir));
+
                 curr = end;
             }
             return ranges;
-        }
-        public static Coord FindStart(StringBuilder[] map, long minRow, long minCol)
-        {
-            // start in second row, find polong past first #
-            for (int i = 0; i < map[1].Length; i++)
-                if (map[1][i] == '#')
-                    return new Coord(1, i + 1 + minCol);
-            return new Coord(-1, -1);
         }
         public static string[] ParseInstructions(string[] input)
         {
@@ -130,72 +130,53 @@ namespace AoC2023
             }
             return instr;
         }
-		public static long Part1(string[] input)
-		{
-			long sum = 0;
-            var set = DigPath(input, out long minRow, out long minCol, out long maxRow, out long maxCol);
-
-            var map = new StringBuilder[maxRow - minRow + 1];
-            for (long i = 0; i < map.Length; i++)
-                map[i] = new StringBuilder(new string('.', (int)(maxCol - minCol) + 1));
-
-            foreach(var entry in set)
-                map[entry.row - minRow][(int)(entry.col - minCol)] = '#';
-
-            var queue = new Queue<Coord>();
-            var curr = FindStart(map, minRow, minCol);
-            queue.Enqueue(new Coord(1, 1));
-            while (queue.Count > 0)
-            {
-                curr = queue.Dequeue();
-
-                if (!set.Contains(curr.MoveUp(1)))
-                {
-                    queue.Enqueue(curr.MoveUp(1));
-                    set.Add(curr.MoveUp(1));
-                }
-                if (!set.Contains(curr.MoveLeft(1)))
-                {
-                    queue.Enqueue(curr.MoveLeft(1));
-                    set.Add(curr.MoveLeft(1));
-                }
-                if (!set.Contains(curr.MoveDown(1)))
-                {
-                    queue.Enqueue(curr.MoveDown(1));
-                    set.Add(curr.MoveDown(1));
-                }
-                if (!set.Contains(curr.MoveRight(1)))
-                {
-                    queue.Enqueue(curr.MoveRight(1));
-                    set.Add(curr.MoveRight(1));
-                }
-            }
-
-            foreach(var line in map)
-            {
-                foreach (var c in line.ToString())
-                    Console.Write(c);
-                Console.WriteLine();
-            }
-
-            return set.Count;
-		}
-        public static long Part2(string[] input)
+        public static long SumEdges(string[] input)
         {
-            //input = ParseInstructions(input);
-            var ranges = DigPathRanges(input, out long minRow, out long minCol, out long maxRow, out long maxCol);
-            
-            // sort by start col to make search for relevant ranges easier
-            ranges.Sort((a, b) => a.start.col.CompareTo(b.start.col));
+            long sum = 0;
+            foreach (var line in input)
+                sum += long.Parse(line.Split(' ')[1]);
+            return sum;
+        }
+        public static Range GetFirstOverlapRange(Range rRange, List<Range> lRanges)
+        {
+            // start or end of left range inbetween right range, or left range contains right range and left range is below right range
+            return lRanges.First(lRange => 
+                ((lRange.start.col >= rRange.start.col && lRange.start.col <= rRange.end.col) 
+                || (lRange.end.col >= rRange.start.col && lRange.end.col <= rRange.end.col)
+                || (lRange.end.col <= rRange.start.col && lRange.start.col >= rRange.end.col))
+                && lRange.start.row > rRange.start.row);
+        }
+        public static long Solve(string[] input)
+        {
+            var ranges = DigPathRanges(input);
+            // sum up edges at beginning, add inside area later
+            long sum = SumEdges(input);
+            // sorting by row allows iterating over the overlap ranges later
+            ranges.Sort((a, b) => a.start.row.CompareTo(b.start.row));
 
-            var relevant = ranges.Where(range => range.dir == Direction.Right || range.dir == Direction.Down).ToList();
-
-            foreach(var range in relevant)
+            var rRanges = ranges.Where(range => range.dir == Direction.Right).ToList();
+            var lRanges = ranges.Where(range => range.dir == Direction.Left).ToList();
+      
+            while (rRanges.Count > 0)
             {
+                var rRange = rRanges.First();
+                rRanges.RemoveAt(0);
 
+                // added range with nothing left
+                if (rRange.start.col > rRange.end.col)
+                    continue;
+
+                var lRange = GetFirstOverlapRange(rRange, lRanges);
+
+                long mul = lRange.start.row - rRange.start.row - 1;
+                var overlap = rRange.RowOverlapAndReconstruct(lRange, rRanges);
+
+                sum += overlap * mul;
             }
 
-            return 0;
+            return sum;
         }
-	}
+        public static long Part1(string[] input) => Solve(input);
+        public static long Part2(string[] input) => Solve(ParseInstructions(input));
+    }
 }
