@@ -86,19 +86,19 @@ namespace AoC2023
                 // iterate over possible directions, continue if direction is not valid
                 for (Direction dir = 0; (int)dir < 4; dir++)
                 {
-                    // turn left or right -> invalid if minimum steps not fulfilled
-                    // allow turning for starting square (0, 0)
-                    if(dir != opposite && dir != curr.dir)
-                        if (curr.dirSteps < minSteps && (curr.row, curr.col) != (0, 0))
-                            continue;
+                    // opposite direction always invalid
+                    if (dir == opposite)
+                        continue;
 
                     // same direction -> invalid if max steps are already reached
                     if (dir == curr.dir && maxSteps == curr.dirSteps)
                         continue;
 
-                    // opposite direction always invalid
-                    if (dir == opposite)
-                        continue;
+                    // turn left or right -> invalid if minimum steps not fulfilled
+                    // allow turning for starting square (0, 0)
+                    if (dir != opposite && dir != curr.dir)
+                        if (curr.dirSteps < minSteps && (curr.row, curr.col) != (0, 0))
+                            continue;
 
                     if (OutOfBounds(map, curr, dir))
                         continue;

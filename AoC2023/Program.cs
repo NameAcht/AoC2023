@@ -7,8 +7,8 @@ namespace AoC2023
         public static void Main()
         {
             var sw = Stopwatch.StartNew();
-            var input = File.ReadAllLines("input17.txt");
-            Console.WriteLine(Day17.Part2(input).ToString());
+            var input = File.ReadAllLines("input18Test.txt");
+            Console.WriteLine(Day18.Part2(input).ToString());
             Console.WriteLine(sw.Elapsed.ToString());
         }
     }
