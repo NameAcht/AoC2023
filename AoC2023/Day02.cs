@@ -1,6 +1,4 @@
-﻿using System.Diagnostics.CodeAnalysis;
-
-namespace AoC2023
+﻿namespace AoC2023
 {
     internal class Day02
     {

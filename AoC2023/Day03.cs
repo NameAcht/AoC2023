@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Runtime.ExceptionServices;
-using System.Text;
+﻿using System.Text;
 using System.Text.RegularExpressions;
 
 namespace AoC2023
@@ -11,16 +9,16 @@ namespace AoC2023
         {
             int sum = 0;
             
-            for (int i = 0; i < schematic.Length; i++)
+            for (int row = 0; row < schematic.Length; row++)
             {
-                string currLine = schematic[i];
-                string nextLine = "............................................................................................................................................";
-                string prevLine = "............................................................................................................................................";
+                string currLine = schematic[row];
+                string nextLine = new string('.', schematic[row].Length);
+                string prevLine = new string('.', schematic[row].Length);
 
-                if(i != schematic.Length - 1)
-                    nextLine = schematic[i + 1];
-                if(i != 0)
-                    prevLine = schematic[i - 1];
+                if(row != schematic.Length - 1)
+                    nextLine = schematic[row + 1];
+                if(row != 0)
+                    prevLine = schematic[row - 1];
 
                 var matches = Regex.Matches(currLine, @"\d+");
                 foreach(Match m in matches)
@@ -49,8 +47,8 @@ namespace AoC2023
             for (int row = 0; row < schematic.Length; row++)
             {
                 string currLine = schematic[row];
-                string nextLine = "............................................................................................................................................";
-                string prevLine = "............................................................................................................................................";
+                string nextLine = new string('.', schematic[row].Length);
+                string prevLine = new string('.', schematic[row].Length);
 
                 if (row != schematic.Length - 1)
                     nextLine = schematic[row + 1];
