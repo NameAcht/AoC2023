@@ -23,10 +23,10 @@ namespace AoC2023
                 if (curr.steps % 2 == steps % 2)
                     potential.Add(pos);
 
-                QueueCoordinate(queue, (pos.row + 1, pos.col), mutMap, seen, curr.steps + 1);
-                QueueCoordinate(queue, (pos.row - 1, pos.col), mutMap, seen, curr.steps + 1);
-                QueueCoordinate(queue, (pos.row, pos.col + 1), mutMap, seen, curr.steps + 1);
-                QueueCoordinate(queue, (pos.row, pos.col - 1), mutMap, seen, curr.steps + 1);
+                TryEnqueue(queue, (pos.row + 1, pos.col), mutMap, seen, curr.steps + 1);
+                TryEnqueue(queue, (pos.row - 1, pos.col), mutMap, seen, curr.steps + 1);
+                TryEnqueue(queue, (pos.row, pos.col + 1), mutMap, seen, curr.steps + 1);
+                TryEnqueue(queue, (pos.row, pos.col - 1), mutMap, seen, curr.steps + 1);
             }
 
             return potential;
@@ -45,7 +45,7 @@ namespace AoC2023
                 Console.WriteLine();
             }
         }
-        public static void QueueCoordinate(Queue<(Coord, long)> queue, Coord pos, StringBuilder[] mutMap, HashSet<Coord> seen, long stepsTaken)
+        public static void TryEnqueue(Queue<(Coord, long)> queue, Coord pos, StringBuilder[] mutMap, HashSet<Coord> seen, long stepsTaken)
         {
             // out of bounds
             if (pos.row < 0 || pos.col < 0 || pos.row >= mutMap.Length || pos.col >= mutMap[0].Length)
@@ -79,10 +79,10 @@ namespace AoC2023
                 if (stepsTaken >= steps && !inverse)
                     continue;
 
-                QueueCoordinate(queue, (pos.row + 1, pos.col), mutMap, seen, stepsTaken + 1);
-                QueueCoordinate(queue, (pos.row - 1, pos.col), mutMap, seen, stepsTaken + 1);
-                QueueCoordinate(queue, (pos.row, pos.col + 1), mutMap, seen, stepsTaken + 1);
-                QueueCoordinate(queue, (pos.row, pos.col - 1), mutMap, seen, stepsTaken + 1);
+                TryEnqueue(queue, (pos.row + 1, pos.col), mutMap, seen, stepsTaken + 1);
+                TryEnqueue(queue, (pos.row - 1, pos.col), mutMap, seen, stepsTaken + 1);
+                TryEnqueue(queue, (pos.row, pos.col + 1), mutMap, seen, stepsTaken + 1);
+                TryEnqueue(queue, (pos.row, pos.col - 1), mutMap, seen, stepsTaken + 1);
             }
 
             return reached.Count;
@@ -102,7 +102,7 @@ namespace AoC2023
 
             long n = steps / map.Length;
 
-            long plots = ((n+1)*(n+1)) * oddTiles.Count + (n*n) * evenTiles.Count - (n+1) * oddCorners + n * evenCorners;
+            long plots = ((n + 1) * (n + 1)) * oddTiles.Count + (n * n) * evenTiles.Count - (n + 1) * oddCorners + n * evenCorners;
             // WHY??????
             plots -= n;
 
