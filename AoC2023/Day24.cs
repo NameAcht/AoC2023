@@ -127,7 +127,7 @@ namespace AoC2023
         {
             var hs = ParseHailstones(input);
             var matrix = EquationMatrix(hs[0], hs[1], hs[2], hs[3]);
-            return LinearSolver.Solve(matrix)[0..3].Sum().Round(0);
+            return LinearAlgebra.Solve(matrix)[0..3].Sum().Round(0);
         }
     }
 }
