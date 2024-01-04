@@ -140,8 +140,8 @@ namespace AoC2023
         public static Range GetFirstOverlapRange(Range rRange, List<Range> lRanges)
         {
             // start or end of left range inbetween right range, or left range contains right range and left range is below right range
-            return lRanges.First(lRange => 
-                ((lRange.start.col >= rRange.start.col && lRange.start.col <= rRange.end.col) 
+            return lRanges.First(lRange =>
+                ((lRange.start.col >= rRange.start.col && lRange.start.col <= rRange.end.col)
                 || (lRange.end.col >= rRange.start.col && lRange.end.col <= rRange.end.col)
                 || (lRange.end.col <= rRange.start.col && lRange.start.col >= rRange.end.col))
                 && lRange.start.row > rRange.start.row);
@@ -156,7 +156,7 @@ namespace AoC2023
 
             var rRanges = ranges.Where(range => range.dir == Direction.Right).ToList();
             var lRanges = ranges.Where(range => range.dir == Direction.Left).ToList();
-      
+
             while (rRanges.Count > 0)
             {
                 var rRange = rRanges.First();

@@ -1,7 +1,7 @@
 namespace AoC2023
 {
-	internal class Day19
-	{
+    internal class Day19
+    {
         public struct Item
         {
             public long x, m, a, s;
@@ -73,9 +73,9 @@ namespace AoC2023
         public static List<Item> ParseItems(string[] input)
         {
             var list = new List<Item>();
-            foreach(var line in input)
+            foreach (var line in input)
             {
-                if(line.StartsWith("{"))
+                if (line.StartsWith("{"))
                 {
                     var split = line.Split(['=', ',', '}']);
                     list.Add(new Item(int.Parse(split[1]), int.Parse(split[3]), int.Parse(split[5]), int.Parse(split[7])));
@@ -135,8 +135,8 @@ namespace AoC2023
             long sum = 0;
             var items = ParseItems(input);
             var workflows = ParseWorkflows(input);
-            
-            foreach(var item in items)
+
+            foreach (var item in items)
             {
                 string curr = "in";
                 string currFlow = workflows[curr];

@@ -18,7 +18,7 @@ namespace AoC2023
                 this.dirSteps = dirSteps;
                 this.dir = dir;
                 this.heatLoss = heatLoss;
-                this.path = new List<(int row, int col)> ();
+                this.path = new List<(int row, int col)>();
             }
             public State()
             {
