@@ -3,8 +3,17 @@
 
 namespace AoC2023
 {
+    /// <summary>
+    /// Linear algebra solver
+    /// </summary>
     public static class LinearAlgebra
     {
+        /// <summary>
+        /// Provide a matrix representing an equations system coefficients, and append the RHS of the equations as another column
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="a"></param>
+        /// <returns></returns>
         public static T[] Solve<T>(T[,] a) where T : INumber<T>
         {
             var n = a.GetLength(dimension: 0);
