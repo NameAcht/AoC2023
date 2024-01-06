@@ -13,8 +13,8 @@ namespace AoC2023
 				vertexCount = 1;
 				children = new Dictionary<Node, int>();
 			}
-            public override string ToString()
-            {
+			public override string ToString()
+			{
 				string str = name + ": ";
 				foreach (var child in children)
 					str += child.Key.name + " ";
@@ -24,13 +24,13 @@ namespace AoC2023
 			{
 				visited.Add(name);
 				foreach (var child in children.Keys)
-					if(!visited.Contains(child.name))
+					if (!visited.Contains(child.name))
 						return child.FurthestNode(cuts, visited);
 				return this;
 			}
 			public void Consume(Node toEat)
 			{
-				foreach(var child in toEat.children)
+				foreach (var child in toEat.children)
 				{
 					if (child.Key == this)
 						continue;
@@ -39,22 +39,22 @@ namespace AoC2023
 					children[child.Key] = val + toEat.children[child.Key];
 					child.Key.children[this] = val + toEat.children[child.Key];
 
-                    // remove consumed node from its children
-                    child.Key.children.Remove(toEat);
-                }
+					// remove consumed node from its children
+					child.Key.children.Remove(toEat);
+				}
 				vertexCount += toEat.vertexCount;
 				toEat.children.Clear();
 				children.Remove(toEat);
 			}
-        }
+		}
 		static List<Node> ParseNodes(string[] input)
 		{
 			var nodes = new Dictionary<string, Node>();
-			foreach(var line in input)
+			foreach (var line in input)
 			{
 				var left = line.Split(' ').First().Trim(':');
 				nodes.TryAdd(left, new Node(left));
-				
+
 				foreach (var right in line.Split(' ')[1..])
 				{
 					var name = right.Trim(':');
@@ -67,24 +67,24 @@ namespace AoC2023
 		}
 		public static int Part1(string[] input)
 		{
-            var nodes = ParseNodes(input);
-            var rndm = new Random();
+			var nodes = ParseNodes(input);
+			var rndm = new Random();
 
-            while (nodes.First().children.Sum(n => n.Value) != 3)
+			while (nodes.First().children.Sum(n => n.Value) != 3)
 			{
 				nodes = ParseNodes(input);
-                while (nodes.Count > 2)
-                {
-                    var idx1 = rndm.Next(0, nodes.Count);
-                    var idx2 = rndm.Next(0, nodes[idx1].children.Count);
+				while (nodes.Count > 2)
+				{
+					var idx1 = rndm.Next(0, nodes.Count);
+					var idx2 = rndm.Next(0, nodes[idx1].children.Count);
 
 					var remove = nodes[idx1].children.Keys.ToList()[idx2];
-                    nodes[idx1].Consume(remove);
-                    nodes.Remove(remove);
-                }
+					nodes[idx1].Consume(remove);
+					nodes.Remove(remove);
+				}
 			}
 
-            return nodes.First().vertexCount * nodes.Last().vertexCount;
+			return nodes.First().vertexCount * nodes.Last().vertexCount;
 		}
 	}
 }

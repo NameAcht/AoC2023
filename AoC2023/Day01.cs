@@ -1,6 +1,6 @@
 ﻿namespace AoC2023
 {
-    public static class Day01
+    internal class Day01
     {
         enum Numbers
         {
